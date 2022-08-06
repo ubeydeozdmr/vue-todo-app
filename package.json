@@ -1,0 +1,21 @@
+{
+  "name": "crema-todo",
+  "version": "1.0.0",
+  "description": "A simple to-do app",
+  "author": "Ubeyde Emir Özdemir",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.0.0",
+    "autoprefixer": "^10.4.8",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.1.8",
+    "vite": "^3.0.0"
+  }
+}
