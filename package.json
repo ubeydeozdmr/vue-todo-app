@@ -1,8 +1,17 @@
 {
   "name": "crema-todo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple to-do app",
   "author": "Ubeyde Emir Özdemir",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ubeydeozdmr/crema-todo.git"
+  },
+  "keywords": [
+    "todo",
+    "to-do"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
