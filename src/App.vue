@@ -72,12 +72,15 @@ export default {
      */
     addTodo() {
       if (this.currentContent === '') this.currentContent = 'Blank to-do';
-      this.todos.push({
+      let newTodo = {
         id: Math.round(Math.random() * 1000000000000),
         content: this.currentContent,
         date: Date.now(),
         completed: false,
-      });
+      };
+
+      this.sort[1] === 'asc' ? this.todos.push(newTodo) : this.todos.unshift(newTodo);
+
       this.currentContent = '';
       this.saveTodo();
     },
@@ -131,8 +134,8 @@ export default {
       <h1 class="text-4xl font-bold">Crema To-Do</h1>
     </div>
     <p v-if="this.todos.length === 0">
-      You didn't add any to-do. To create your first to-do, type below then hit enter
-      or the + sign.
+      You didn't add any to-do. To create your first to-do, type below then hit enter or
+      the + sign.
     </p>
     <div class="w-full flex flex-col gap-3">
       <!-- <div class="w-full flex gap-3 md:gap-6 mb-3">
@@ -146,9 +149,7 @@ export default {
         <div class="w-1/12 flex gap-3 justify-center">
           <a
             href="#"
-            @click="
-              this.sort[1] === 'asc' ? sortTodosByDateDesc() : sortTodosByDateAsc()
-            "
+            @click="this.sort[1] === 'asc' ? sortTodosByDateDesc() : sortTodosByDateAsc()"
             class="text-gray-500 hover:text-gray-700 transition-all duration-200"
           >
             <!-- SORT &uarr;&darr; -->
@@ -226,45 +227,6 @@ export default {
         </div>
       </div>
     </div>
-    <!-- <table class="w-full">
-      <thead>
-        <th>Status</th>
-        <th>Content</th>
-        <th class="w-1/12">Operations</th>
-      </thead>
-      <tbody>
-        <tr class="text-center" v-for="todo in todos">
-          <td>
-            <a
-              href="#"
-              v-if="todo.completed"
-              @click="toggleStatus(todo.id)"
-              class="flex justify-center"
-            >
-              <CheckSquare />
-            </a>
-            <a
-              href="#"
-              v-else="todo.completed"
-              @click="toggleStatus(todo.id)"
-              class="flex justify-center"
-            >
-              <Square />
-            </a>
-          </td>
-          <td>{{ todo.content }}</td>
-          <td>
-            <a href="#" class="flex justify-center">
-              <Pencil />
-            </a>
-
-            <a href="#" class="flex justify-center">
-              <Trash />
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table> -->
     <!-- <div>
       <h1 class="text-2xl gap-12 font-bold mb-6">Add new to-do</h1>
       <div class="flex gap-3">
@@ -293,7 +255,7 @@ export default {
   <a
     target="_blank"
     href="https://github.com/ubeydeozdmr/crema-todo"
-    class="rounded text-xs text-center w-full bg-gray-200 absolute bottom-0 left-0"
+    class="rounded text-xs text-center w-full bg-gray-200 fixed bottom-0 left-0"
   >
     Created by Ubeyde Emir Özdemir with ❤️ Click for GitHub link
   </a>
@@ -305,14 +267,4 @@ export default {
   </button> -->
 </template>
 
-<style scoped>
-/* table,
-th,
-td {
-  border: 1px solid black;
-}
-
-td {
-  vertical-align: center;
-} */
-</style>
+<style scoped></style>
