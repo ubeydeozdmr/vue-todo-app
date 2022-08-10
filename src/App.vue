@@ -303,6 +303,7 @@ export default {
         <div class="w-1/12 flex gap-3 justify-center">
           <a
             href="#"
+            @click.prevent
             @click="
               this.data.preferences.sortDesc = !this.data.preferences.sortDesc;
               this.rearrangeTodos();
@@ -314,7 +315,11 @@ export default {
         </div>
       </div>
       <div class="w-full flex flex-col gap-3">
-        <div class="w-full flex gap-3 md:gap-6" v-for="todo in filterTodos()">
+        <div
+          class="w-full flex gap-3 md:gap-6"
+          v-for="todo in filterTodos()"
+          :key="todo.id"
+        >
           <div
             class="w-1/12 flex justify-center"
             :class="
@@ -326,6 +331,7 @@ export default {
           >
             <a
               href="#"
+              @click.prevent
               v-if="todo.completed"
               @click="toggleStatus(todo.id)"
               class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200"
@@ -334,6 +340,7 @@ export default {
             </a>
             <a
               href="#"
+              @click.prevent
               v-else="todo.completed"
               @click="toggleStatus(todo.id)"
               class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200"
@@ -380,6 +387,7 @@ export default {
           >
             <a
               href="#"
+              @click.prevent
               @click="removeTodo(todo.id)"
               class="text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 transition-all duration-200"
             >
@@ -405,6 +413,7 @@ export default {
         <div class="w-1/12 flex gap-3 justify-center">
           <a
             href="#"
+            @click.prevent
             @click="addTodo"
             class="text-gray-700 dark:text-gray-200 hover:text-green-700 dark:hover:text-green-200 transition-all duration-200"
           >
@@ -414,7 +423,11 @@ export default {
       </div>
     </div>
     <div class="flex flex-col gap-6">
-      <a href="#" @click="this.cache.expandPreferences = !this.cache.expandPreferences">
+      <a
+        href="#"
+        @click.prevent
+        @click="this.cache.expandPreferences = !this.cache.expandPreferences"
+      >
         <h2
           class="text-md text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3"
         >
@@ -427,6 +440,7 @@ export default {
         <div class="flex gap-6">
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="this.data.preferences.theme = 'os'"
           >
@@ -441,6 +455,7 @@ export default {
           </a>
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="this.data.preferences.theme = 'light'"
           >
@@ -450,6 +465,7 @@ export default {
           </a>
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="this.data.preferences.theme = 'dark'"
           >
@@ -463,6 +479,7 @@ export default {
         </p>
         <a
           href="#"
+          @click.prevent
           class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
           @click="this.data.preferences.hideBanner = !this.data.preferences.hideBanner"
         >
@@ -472,6 +489,7 @@ export default {
         </a>
         <a
           href="#"
+          @click.prevent
           class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
           @click="
             this.data.preferences.hideCompletedTodos =
@@ -486,6 +504,7 @@ export default {
         </a>
         <a
           href="#"
+          @click.prevent
           class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
           @click="
             this.data.preferences.hideLastDeletedTodoNotifications =
@@ -505,6 +524,7 @@ export default {
         <div class="flex gap-6">
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="this.data.preferences.date = 'hide'"
           >
@@ -519,6 +539,7 @@ export default {
           </a>
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="this.data.preferences.date = 'date'"
           >
@@ -528,6 +549,7 @@ export default {
           </a>
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="this.data.preferences.date = 'time'"
           >
@@ -537,6 +559,7 @@ export default {
           </a>
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="this.data.preferences.date = 'full'"
           >
@@ -549,6 +572,7 @@ export default {
         <div class="flex gap-6">
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="
               this.data.preferences.sortType = 'date';
@@ -566,6 +590,7 @@ export default {
           </a>
           <a
             href="#"
+            @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="
               this.data.preferences.sortType = 'name';
@@ -604,6 +629,7 @@ export default {
       <button @click="this.recoverTodo()" class="bg-white rounded px-2 py-1">UNDO</button>
       <a
         href="#"
+        @click.prevent
         class="px-2 py-1 font-bold"
         @click="
           this.cache.showLastDeletedTodoNotification = false;
