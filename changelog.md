@@ -2,6 +2,10 @@
 
 [Return to README.md](./README.md)
 
+## v1.2.1
+
+- Fixed the issue where when you click any button it shows the top part of the site.
+
 ## v1.2.0
 
 - Preferences feature improved
