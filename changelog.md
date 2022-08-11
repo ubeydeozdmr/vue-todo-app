@@ -2,6 +2,20 @@
 
 [Return to README.md](./README.md)
 
+## v1.3.0
+
+- Now, you can input your first name to show up top of the page (Instead of Crema To-Do title).
+
+  - To activate this feature, go to Preferences > First name.
+
+- Search todo feature added (Now, you can input keywords to find todo which you want)
+
+  - If you don't want a search bar top of todolist, you can hide search bar from preferences ("Hide search bar" feature added)
+
+- Show completed todos feature added
+
+  - Hide completed todos feature (boolean) removed; instead, added three option called "Show all todos", "Show active todos" and "Show completed todos".
+
 ## v1.2.1
 
 - Fixed the issue where when you click any button it shows the top part of the site.

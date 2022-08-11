@@ -16,7 +16,7 @@ export default {
   data() {
     return {
       data: {
-        version: 1,
+        version: 2,
         // todos: [
         //   // NOTE: This is just a test object for development.
         //   {
@@ -60,17 +60,22 @@ export default {
         preferences: {
           theme: 'os' /* light, dark, os */,
           sortType: 'date' /* date, name */,
+          showTodos: 'all' /* all, active, completed */,
           sortDesc: false,
           hideBanner: false,
-          hideCompletedTodos: false,
           hideLastDeletedTodoNotifications: false,
+          hideSearchBar: false,
           date: 'hide' /* hide, date, time, full */,
+        },
+        user: {
+          firstName: undefined,
         },
       },
       cache: {
-        activeTodos: undefined,
+        filteredTodos: undefined,
         expandPreferences: false,
         currentContent: '',
+        searchContent: '',
         lastDeletedTodo: undefined,
         showLastDeletedTodoNotification: false,
       },
@@ -83,43 +88,37 @@ export default {
       },
       deep: true,
     },
+    'data.user.firstName': {
+      handler(input) {
+        this.data.user.firstName = input.trim();
+      },
+    },
   },
-  beforeCreate() {
-    ///////////////////////////////////////////////////////////////
-    /* Some fixes for datas from old versions (v1.1.0 and below) */
+  created() {
     if (localStorage.getItem('data')) {
       let checkObj = JSON.parse(localStorage.getItem('data'));
 
-      if (!checkObj.version || checkObj.version < 1) {
-        console.log("Old version detected. We're working on data object.");
-        this.data = {};
-        this.data.todos = JSON.parse(localStorage.getItem('data'));
-        this.data.preferences = {};
-        this.data.preferences.hideBanner = JSON.parse(localStorage.getItem('hideBanner'));
-        /* prettier-ignore */
-        this.data.preferences.hideCompletedTodos = JSON.parse(localStorage.getItem('hideCompletedTodos'));
-        this.data.preferences.theme = JSON.parse(localStorage.getItem('theme'));
-        this.data.preferences.sortType = JSON.parse(localStorage.getItem('sort'))[0];
-        JSON.parse(localStorage.getItem('sort'))[1] === 'desc'
-          ? (this.data.preferences.sortDesc = true)
-          : (this.data.preferences.sortDesc = false);
-
-        this.data.version = 1;
-
-        localStorage.removeItem('hideBanner');
-        localStorage.removeItem('hideCompletedTodos');
-        localStorage.removeItem('theme');
-        localStorage.removeItem('sort');
-
-        localStorage.setItem('data', JSON.stringify(this.data));
+      switch (checkObj.version) {
+        case 2:
+          /* v-1.3 and above */
+          this.data = checkObj;
+          break;
+        case 1:
+          /* between v-1.1.1 and v-1.2.1 */
+          this.data = checkObj;
+          this.data.version = 2;
+          this.data.user = {};
+          checkObj.preferences.hideCompletedTodos
+            ? (this.data.preferences.showTodos = 'active')
+            : (this.data.preferences.showTodos = 'all');
+          break;
+        default:
+          /* v-1.1.0 and below */
+          localStorage.clear();
+          break;
       }
     }
-    ///////////////////////////////////////////////////////////////
-  },
-  created() {
-    localStorage.getItem('data')
-      ? (this.data = JSON.parse(localStorage.getItem('data')))
-      : localStorage.setItem('data', JSON.stringify(this.data));
+    localStorage.setItem('data', JSON.stringify(this.data));
   },
   mounted() {
     switch (this.data.preferences.theme) {
@@ -137,15 +136,21 @@ export default {
     }
 
     this.rearrangeTodos();
-    this.hideCompletedTodosHandler();
   },
   methods: {
     filterTodos() {
-      if (this.data.preferences.hideCompletedTodos) {
-        return this.cache.activeTodos;
-      } else {
-        return this.data.todos;
+      if (this.cache.searchContent !== '') {
+        return this.cache.filteredTodos.filter(todo =>
+          todo.content.toLowerCase().includes(this.cache.searchContent.toLowerCase())
+        );
       }
+
+      return this.cache.filteredTodos;
+      // if (this.data.preferences.showTodos === 'active') {
+      //   return this.cache.filteredTodos;
+      // } else {
+      //   return this.data.todos;
+      // }
     },
     /**
      * @param {Number} id - ID property of object in todos array
@@ -183,7 +188,7 @@ export default {
           break;
       }
 
-      this.hideCompletedTodosHandler();
+      this.rearrangeTodos();
 
       this.cache.currentContent = '';
     },
@@ -208,7 +213,7 @@ export default {
         }, 7000);
       }
 
-      this.hideCompletedTodosHandler();
+      this.rearrangeTodos();
     },
     /**
      * @description If you deleted any to-do by mistake, you can recover your last to-do.
@@ -230,6 +235,8 @@ export default {
             : this.data.todos.push(this.cache.lastDeletedTodo);
           break;
       }
+
+      this.rearrangeTodos();
     },
     /**
      * @param {Date} date - Date in milliseconds
@@ -265,10 +272,18 @@ export default {
           break;
       }
 
-      this.hideCompletedTodosHandler();
-    },
-    hideCompletedTodosHandler() {
-      this.cache.activeTodos = this.data.todos.filter(todo => !todo.completed);
+      switch (this.data.preferences.showTodos) {
+        case 'active':
+          this.cache.filteredTodos = this.data.todos.filter(todo => !todo.completed);
+          break;
+        case 'completed':
+          this.cache.filteredTodos = this.data.todos.filter(todo => todo.completed);
+          break;
+        default:
+          /* Including case 'all' */
+          this.cache.filteredTodos = this.data.todos;
+          break;
+      }
     },
     // myFunc() {},
   },
@@ -291,7 +306,13 @@ export default {
   <div class="p-6 md:p-12 gap-6 md:gap-12 flex flex-col">
     <div class="w-full flex flex-col gap-3">
       <div>
-        <h1 class="text-4xl font-bold dark:text-gray-200">Crema To-Do</h1>
+        <h1 class="text-4xl font-bold dark:text-gray-200">
+          {{
+            this.data.user.firstName
+              ? `Hello, ${this.data.user.firstName}`
+              : 'Crema To-Do'
+          }}
+        </h1>
       </div>
       <p v-if="this.data.todos.length === 0" class="dark:text-gray-300">
         You didn't add any to-do. To create your first to-do, type below then hit enter or
@@ -299,7 +320,17 @@ export default {
       </p>
       <div class="w-full flex gap-3 md:gap-6" v-else>
         <div class="w-1/12 flex justify-center"></div>
-        <div class="w-10/12"></div>
+        <div class="w-10/12 flex justify-end">
+          <input
+            type="text"
+            name="searchTodo"
+            id="searchTodo"
+            class="rounded px-3 bg-gray-100 dark:bg-gray-700 dark:text-white w-full md:w-auto"
+            placeholder="Search todo"
+            v-if="!this.data.preferences.hideSearchBar"
+            v-model="this.cache.searchContent"
+          />
+        </div>
         <div class="w-1/12 flex gap-3 justify-center">
           <a
             href="#"
@@ -436,6 +467,17 @@ export default {
         </h2>
       </a>
       <div class="flex flex-col gap-6" v-if="this.cache.expandPreferences">
+        <div class="flex gap-6">
+          <p class="dark:text-gray-400 text-sm">First name:</p>
+          <input
+            type="text"
+            name="firstName"
+            id="firstName"
+            class="rounded bg-gray-100 dark:bg-gray-700 dark:text-white px-3"
+            placeholder="Your first name"
+            v-model="this.data.user.firstName"
+          />
+        </div>
         <p class="dark:text-gray-400 text-sm">Theme:</p>
         <div class="flex gap-6">
           <a
@@ -492,15 +534,13 @@ export default {
           @click.prevent
           class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
           @click="
-            this.data.preferences.hideCompletedTodos =
-              !this.data.preferences.hideCompletedTodos;
-            this.hideCompletedTodosHandler();
+            this.data.preferences.hideSearchBar = !this.data.preferences.hideSearchBar
           "
         >
           <!-- prettier-ignore -->
-          <CheckSquare v-if="this.data.preferences.hideCompletedTodos" height="20" width="20" />
+          <CheckSquare v-if="this.data.preferences.hideSearchBar" height="20" width="20" />
           <Square v-else height="20" width="20" />
-          <p>Hide completed todos</p>
+          <p>Hide search bar</p>
         </a>
         <a
           href="#"
@@ -600,6 +640,53 @@ export default {
             <RecordCircle v-if="this.data.preferences.sortType === 'name'" />
             <Circle v-else />
             <p>Name</p>
+          </a>
+        </div>
+        <p class="dark:text-gray-400 text-sm">Show todos:</p>
+        <div class="flex gap-6">
+          <a
+            href="#"
+            @click.prevent
+            class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
+            @click="
+              this.data.preferences.showTodos = 'all';
+              this.rearrangeTodos();
+            "
+          >
+            <RecordCircle
+              v-if="
+                this.data.preferences.showTodos === 'all' ||
+                this.data.preferences.showTodos === undefined
+              "
+            />
+            <Circle v-else />
+            <p>All</p>
+          </a>
+          <a
+            href="#"
+            @click.prevent
+            class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
+            @click="
+              this.data.preferences.showTodos = 'active';
+              this.rearrangeTodos();
+            "
+          >
+            <RecordCircle v-if="this.data.preferences.showTodos === 'active'" />
+            <Circle v-else />
+            <p>Active</p>
+          </a>
+          <a
+            href="#"
+            @click.prevent
+            class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
+            @click="
+              this.data.preferences.showTodos = 'completed';
+              rearrangeTodos();
+            "
+          >
+            <RecordCircle v-if="this.data.preferences.showTodos === 'completed'" />
+            <Circle v-else />
+            <p>Completed</p>
           </a>
         </div>
       </div>

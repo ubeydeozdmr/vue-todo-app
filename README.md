@@ -6,16 +6,19 @@ A simple to-do app built using [Vue.js](https://vuejs.org) and [tailwindcss](htt
 
 In this to-do app, you can add new todos, edit them or delete them.
 
-## What's new in v1.2?
+## What's new in v1.3?
 
-- Preferences feature improved
+- Now, you can input your first name to show up top of the page (Instead of Crema To-Do title).
 
-  - "Hide To-Do deleted messages" option added for new recover last deleted to-do feature.
-  - Now, you can see date or time (or both) below of your todos.
-  - Now, you can sort your todos by name instead of date.
+  - To activate this feature, go to Preferences > First name.
 
-- Recover your last deleted to-do
-  - If you deleted any to-do by mistake, you can recover it. Just press the "UNDO" button on the light red pop-up.
+- Search todo feature added (Now, you can input keywords to find todo which you want)
+
+  - If you don't want a search bar top of todolist, you can hide search bar from preferences ("Hide search bar" feature added)
+
+- Show completed todos feature added
+
+  - Hide completed todos feature (boolean) removed; instead, added three option called "Show all todos", "Show active todos" and "Show completed todos".
 
 [See full changelog](./changelog.md)
 
