@@ -174,11 +174,12 @@ export default {
       ).completed;
     },
     /**
-     * @param {String} content - Content of the todo (content input will be taken from user)
+     * @description This method is used to add a todo when the + button or enter is pressed after the user has entered the todo input.
      */
     addTodo() {
       this.cache.currentContent = this.cache.currentContent.trim();
       if (this.cache.currentContent === '') this.cache.currentContent = 'Blank to-do';
+
       let newTodo = {
         id: Math.round(Math.random() * 1000000000000),
         content: this.cache.currentContent,
@@ -206,6 +207,7 @@ export default {
     },
     /**
      * @param {Number} id - ID property of the todo
+     * @description This method is used to delete the related todo when the trash icon is pressed.
      */
     removeTodo(id) {
       [this.cache.lastDeletedTodo] = this.data.todos.splice(
@@ -234,6 +236,10 @@ export default {
       clearTimeout(timeout);
       this.cache.showLastDeletedTodoNotification = false;
 
+    /**
+     * @param {object} todoObj - Todo object in todos array or this.cache.lastDeletedTodo
+     * @description This method is a handler written to avoid duplication of the same code block. It is used in both addTodo and recoverTodo methods.
+     */
       switch (this.data.preferences.sortType) {
         case 'name':
           this.data.preferences.sortDesc
@@ -253,6 +259,7 @@ export default {
     /**
      * @param {Date} date - Date in milliseconds
      * @returns new Date (localized)
+     * @description This method takes the date in milliseconds as a parameter and returns a new localized date, time, or date+time.
      */
     formatDate(date) {
       switch (this.data.preferences.date) {
@@ -267,7 +274,7 @@ export default {
       }
     },
     /**
-     * @description - Handler for sorting todos.
+     * @description - This method is a handler for sorting todos by date/name or ascending/descending.
      */
     rearrangeTodos() {
       switch (this.data.preferences.sortType) {
