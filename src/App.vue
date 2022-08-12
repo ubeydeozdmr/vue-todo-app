@@ -20,9 +20,21 @@ export default {
         // todos: [
         //   // NOTE: This is just a test object for development.
         //   {
-        //     id: 987192045632,
-        //     content: 'Hello World!',
-        //     date: 1659877289968,
+        //     id: 929307412003,
+        //     content: 'Run for 5 kilometers',
+        //     date: 1660329584961,
+        //     completed: false,
+        //   },
+        //   {
+        //     id: 162381830310,
+        //     content: 'Check emails',
+        //     date: 1660329438631,
+        //     completed: true,
+        //   },
+        //   {
+        //     id: 325332161656,
+        //     content: 'Pay for rent',
+        //     date: 1660329420947,
         //     completed: false,
         //   },
         //   {
