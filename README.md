@@ -34,7 +34,7 @@ In this to-do app, you can add new todos, edit them or delete them.
 
 ## Screenshots
 
-![v1.2 overview with light theme](./screenshots/v1.2-overview-light.png)
-![v1.2 preferences with light theme](./screenshots/v1.2-preferences-light.png)
-![v1.2 overview with dark theme](./screenshots/v1.2-overview-dark.png)
-![v1.2 preferences with light theme](./screenshots/v1.2-preferences-dark.png)
+![v1.3 overview with light theme](./screenshots/v1.3-overview-light.png)
+![v1.3 preferences with light theme](./screenshots/v1.3-preferences-light.png)
+![v1.3 overview with dark theme](./screenshots/v1.3-overview-dark.png)
+![v1.3 preferences with light theme](./screenshots/v1.3-preferences-dark.png)

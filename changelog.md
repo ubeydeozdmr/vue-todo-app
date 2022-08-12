@@ -2,6 +2,12 @@
 
 [Return to README.md](./README.md)
 
+## v1.3.1
+
+- Fixed the spacebar not working in the first name field.
+
+- Some background changes. (JSDoc descriptions, method name/types etc.)
+
 ## v1.3.0
 
 - Now, you can input your first name to show up top of the page (Instead of Crema To-Do title).
