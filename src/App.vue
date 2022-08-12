@@ -100,6 +100,29 @@ export default {
       },
       deep: true,
     },
+  },
+  computed: {
+    /**
+     * @returns title in string
+     * @description If the user has set a first name for self, the first name will be displayed after "Hello, " in the title of the application, otherwise "Crema To-Do" will be seen in the title.
+     */
+    personalizedTitle() {
+      return this.data.user.firstName
+        ? `Hello, ${this.data.user.firstName}`
+        : 'Crema To-Do';
+    },
+    /**
+     * @returns all filtered todos or filtered todos matching search results
+     * @description If any input is entered in the search bar, todos containing the entered input are displayed, otherwise all filtered todos are displayed.
+     */
+    filterTodos() {
+      if (this.cache.searchContent !== '') {
+        return this.cache.filteredTodos.filter(todo =>
+          todo.content.toLowerCase().includes(this.cache.searchContent.toLowerCase())
+        );
+      }
+
+      return this.cache.filteredTodos;
     },
   },
   created() {
@@ -146,20 +169,6 @@ export default {
     this.rearrangeTodos();
   },
   methods: {
-    filterTodos() {
-      if (this.cache.searchContent !== '') {
-        return this.cache.filteredTodos.filter(todo =>
-          todo.content.toLowerCase().includes(this.cache.searchContent.toLowerCase())
-        );
-      }
-
-      return this.cache.filteredTodos;
-      // if (this.data.preferences.showTodos === 'active') {
-      //   return this.cache.filteredTodos;
-      // } else {
-      //   return this.data.todos;
-      // }
-    },
     /**
      * @param {Number} id - ID property of object in todos array
      * @description - Sets true if the completed property of the selected to-do object is false, false if true.
@@ -183,19 +192,7 @@ export default {
         completed: false,
       };
 
-      switch (this.data.preferences.sortType) {
-        case 'name':
-          this.data.preferences.sortDesc
-            ? this.data.todos.push(newTodo)
-            : this.data.todos.unshift(newTodo);
-          break;
-        default:
-          /* Including case 'date': */
-          this.data.preferences.sortDesc
-            ? this.data.todos.unshift(newTodo)
-            : this.data.todos.push(newTodo);
-          break;
-      }
+      this.unshiftOrPushHandler(newTodo);
 
       this.rearrangeTodos();
 
@@ -232,25 +229,28 @@ export default {
       clearTimeout(timeout);
       this.cache.showLastDeletedTodoNotification = false;
 
+      this.unshiftOrPushHandler(this.cache.lastDeletedTodo);
+
+      this.rearrangeTodos();
+    },
     /**
      * @param {object} todoObj - Todo object in todos array or this.cache.lastDeletedTodo
      * @description This method is a handler written to avoid duplication of the same code block. It is used in both addTodo and recoverTodo methods.
      */
+    unshiftOrPushHandler(todoObj) {
       switch (this.data.preferences.sortType) {
         case 'name':
           this.data.preferences.sortDesc
-            ? this.data.todos.push(this.cache.lastDeletedTodo)
-            : this.data.todos.unshift(this.cache.lastDeletedTodo);
+            ? this.data.todos.push(todoObj)
+            : this.data.todos.unshift(todoObj);
           break;
         default:
           /* Including case 'date': */
           this.data.preferences.sortDesc
-            ? this.data.todos.unshift(this.cache.lastDeletedTodo)
-            : this.data.todos.push(this.cache.lastDeletedTodo);
+            ? this.data.todos.unshift(todoObj)
+            : this.data.todos.push(todoObj);
           break;
       }
-
-      this.rearrangeTodos();
     },
     /**
      * @param {Date} date - Date in milliseconds
@@ -300,7 +300,6 @@ export default {
           break;
       }
     },
-    // myFunc() {},
   },
   components: {
     CheckSquare,
@@ -322,14 +321,10 @@ export default {
     <div class="w-full flex flex-col gap-3">
       <div>
         <h1 class="text-4xl font-bold dark:text-gray-200">
-          {{
-            this.data.user.firstName
-              ? `Hello, ${this.data.user.firstName}`
-              : 'Crema To-Do'
-          }}
+          {{ personalizedTitle }}
         </h1>
       </div>
-      <p v-if="this.data.todos.length === 0" class="dark:text-gray-300">
+      <p v-if="data.todos.length === 0" class="dark:text-gray-300">
         You didn't add any to-do. To create your first to-do, type below then hit enter or
         the + sign.
       </p>
@@ -342,8 +337,8 @@ export default {
             id="searchTodo"
             class="rounded px-3 bg-gray-100 dark:bg-gray-700 dark:text-white w-full md:w-auto"
             placeholder="Search todo"
-            v-if="!this.data.preferences.hideSearchBar"
-            v-model="this.cache.searchContent"
+            v-if="!data.preferences.hideSearchBar"
+            v-model="cache.searchContent"
           />
         </div>
         <div class="w-1/12 flex gap-3 justify-center">
@@ -351,8 +346,8 @@ export default {
             href="#"
             @click.prevent
             @click="
-              this.data.preferences.sortDesc = !this.data.preferences.sortDesc;
-              this.rearrangeTodos();
+              data.preferences.sortDesc = !data.preferences.sortDesc;
+              rearrangeTodos();
             "
             class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-200"
           >
@@ -363,14 +358,13 @@ export default {
       <div class="w-full flex flex-col gap-3">
         <div
           class="w-full flex gap-3 md:gap-6"
-          v-for="todo in filterTodos()"
+          v-for="todo in filterTodos"
           :key="todo.id"
         >
           <div
             class="w-1/12 flex justify-center"
             :class="
-              this.data.preferences.date !== 'hide' &&
-              this.data.preferences.date !== undefined
+              data.preferences.date !== 'hide' && data.preferences.date !== undefined
                 ? 'mt-2'
                 : 'mt-0'
             "
@@ -407,26 +401,18 @@ export default {
             />
             <p
               v-if="
-                this.data.preferences.date !== 'hide' &&
-                this.data.preferences.date !== undefined
+                data.preferences.date !== 'hide' && data.preferences.date !== undefined
               "
               class="text-xs text-gray-800 dark:text-gray-400"
               :class="todo.completed ? 'text-gray-300 dark:text-gray-700' : ''"
             >
-              {{
-                this.data.preferences.date === 'full'
-                  ? new Date(todo.date).toLocaleString()
-                  : this.data.preferences.date === 'date'
-                  ? new Date(todo.date).toLocaleDateString()
-                  : new Date(todo.date).toLocaleTimeString()
-              }}
+              {{ formatDate(todo.date) }}
             </p>
           </div>
           <div
             class="w-1/12 flex gap-3 justify-center"
             :class="
-              this.data.preferences.date !== 'hide' &&
-              this.data.preferences.date !== undefined
+              data.preferences.date !== 'hide' && data.preferences.date !== undefined
                 ? 'mt-2'
                 : 'mt-0'
             "
@@ -472,16 +458,16 @@ export default {
       <a
         href="#"
         @click.prevent
-        @click="this.cache.expandPreferences = !this.cache.expandPreferences"
+        @click="cache.expandPreferences = !cache.expandPreferences"
       >
         <h2
           class="text-md text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3"
         >
-          <ChevronBottom v-if="this.cache.expandPreferences" />
+          <ChevronBottom v-if="cache.expandPreferences" />
           <ChevronRight v-else /> Preferences
         </h2>
       </a>
-      <div class="flex flex-col gap-6" v-if="this.cache.expandPreferences">
+      <div class="flex flex-col gap-6" v-if="cache.expandPreferences">
         <div class="flex gap-6">
           <p class="dark:text-gray-400 text-sm">First name:</p>
           <input
@@ -499,12 +485,11 @@ export default {
             href="#"
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-            @click="this.data.preferences.theme = 'os'"
+            @click="data.preferences.theme = 'os'"
           >
             <RecordCircle
               v-if="
-                this.data.preferences.theme === 'os' ||
-                this.data.preferences.theme === undefined
+                data.preferences.theme === 'os' || data.preferences.theme === undefined
               "
             />
             <Circle v-else />
@@ -514,9 +499,9 @@ export default {
             href="#"
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-            @click="this.data.preferences.theme = 'light'"
+            @click="data.preferences.theme = 'light'"
           >
-            <RecordCircle v-if="this.data.preferences.theme === 'light'" />
+            <RecordCircle v-if="data.preferences.theme === 'light'" />
             <Circle v-else />
             <p>Light</p>
           </a>
@@ -524,9 +509,9 @@ export default {
             href="#"
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-            @click="this.data.preferences.theme = 'dark'"
+            @click="data.preferences.theme = 'dark'"
           >
-            <RecordCircle v-if="this.data.preferences.theme === 'dark'" />
+            <RecordCircle v-if="data.preferences.theme === 'dark'" />
             <Circle v-else />
             <p>Dark</p>
           </a>
@@ -538,9 +523,9 @@ export default {
           href="#"
           @click.prevent
           class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-          @click="this.data.preferences.hideBanner = !this.data.preferences.hideBanner"
+          @click="data.preferences.hideBanner = !data.preferences.hideBanner"
         >
-          <CheckSquare v-if="this.data.preferences.hideBanner" height="20" width="20" />
+          <CheckSquare v-if="data.preferences.hideBanner" height="20" width="20" />
           <Square v-else height="20" width="20" />
           <p>Hide "Created by" banner</p>
         </a>
@@ -548,12 +533,9 @@ export default {
           href="#"
           @click.prevent
           class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-          @click="
-            this.data.preferences.hideSearchBar = !this.data.preferences.hideSearchBar
-          "
+          @click="data.preferences.hideSearchBar = !this.data.preferences.hideSearchBar"
         >
-          <!-- prettier-ignore -->
-          <CheckSquare v-if="this.data.preferences.hideSearchBar" height="20" width="20" />
+          <CheckSquare v-if="data.preferences.hideSearchBar" height="20" width="20" />
           <Square v-else height="20" width="20" />
           <p>Hide search bar</p>
         </a>
@@ -562,12 +544,12 @@ export default {
           @click.prevent
           class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
           @click="
-            this.data.preferences.hideLastDeletedTodoNotifications =
-              !this.data.preferences.hideLastDeletedTodoNotifications
+            data.preferences.hideLastDeletedTodoNotifications =
+              !data.preferences.hideLastDeletedTodoNotifications
           "
         >
           <!-- prettier-ignore -->
-          <CheckSquare v-if="this.data.preferences.hideLastDeletedTodoNotifications" height="20" width="20" />
+          <CheckSquare v-if="data.preferences.hideLastDeletedTodoNotifications" height="20" width="20" />
           <Square v-else height="20" width="20" />
           <p>Hide "Deleted to-do." notifications</p>
         </a>
@@ -581,12 +563,11 @@ export default {
             href="#"
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-            @click="this.data.preferences.date = 'hide'"
+            @click="data.preferences.date = 'hide'"
           >
             <RecordCircle
               v-if="
-                this.data.preferences.date === 'hide' ||
-                this.data.preferences.date === undefined
+                data.preferences.date === 'hide' || data.preferences.date === undefined
               "
             />
             <Circle v-else />
@@ -596,9 +577,9 @@ export default {
             href="#"
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-            @click="this.data.preferences.date = 'date'"
+            @click="data.preferences.date = 'date'"
           >
-            <RecordCircle v-if="this.data.preferences.date === 'date'" />
+            <RecordCircle v-if="data.preferences.date === 'date'" />
             <Circle v-else />
             <p>Date</p>
           </a>
@@ -606,9 +587,9 @@ export default {
             href="#"
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-            @click="this.data.preferences.date = 'time'"
+            @click="data.preferences.date = 'time'"
           >
-            <RecordCircle v-if="this.data.preferences.date === 'time'" />
+            <RecordCircle v-if="data.preferences.date === 'time'" />
             <Circle v-else />
             <p>Time</p>
           </a>
@@ -616,9 +597,9 @@ export default {
             href="#"
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
-            @click="this.data.preferences.date = 'full'"
+            @click="data.preferences.date = 'full'"
           >
-            <RecordCircle v-if="this.data.preferences.date === 'full'" />
+            <RecordCircle v-if="data.preferences.date === 'full'" />
             <Circle v-else />
             <p>Full</p>
           </a>
@@ -630,14 +611,14 @@ export default {
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="
-              this.data.preferences.sortType = 'date';
-              this.rearrangeTodos();
+              data.preferences.sortType = 'date';
+              rearrangeTodos();
             "
           >
             <RecordCircle
               v-if="
-                this.data.preferences.sortType === 'date' ||
-                this.data.preferences.sortType === undefined
+                data.preferences.sortType === 'date' ||
+                data.preferences.sortType === undefined
               "
             />
             <Circle v-else />
@@ -648,11 +629,11 @@ export default {
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="
-              this.data.preferences.sortType = 'name';
-              this.rearrangeTodos();
+              data.preferences.sortType = 'name';
+              rearrangeTodos();
             "
           >
-            <RecordCircle v-if="this.data.preferences.sortType === 'name'" />
+            <RecordCircle v-if="data.preferences.sortType === 'name'" />
             <Circle v-else />
             <p>Name</p>
           </a>
@@ -664,14 +645,14 @@ export default {
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="
-              this.data.preferences.showTodos = 'all';
-              this.rearrangeTodos();
+              data.preferences.showTodos = 'all';
+              rearrangeTodos();
             "
           >
             <RecordCircle
               v-if="
-                this.data.preferences.showTodos === 'all' ||
-                this.data.preferences.showTodos === undefined
+                data.preferences.showTodos === 'all' ||
+                data.preferences.showTodos === undefined
               "
             />
             <Circle v-else />
@@ -682,11 +663,11 @@ export default {
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="
-              this.data.preferences.showTodos = 'active';
-              this.rearrangeTodos();
+              data.preferences.showTodos = 'active';
+              rearrangeTodos();
             "
           >
-            <RecordCircle v-if="this.data.preferences.showTodos === 'active'" />
+            <RecordCircle v-if="data.preferences.showTodos === 'active'" />
             <Circle v-else />
             <p>Active</p>
           </a>
@@ -695,11 +676,11 @@ export default {
             @click.prevent
             class="text-gray-700 hover:text-black dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 flex gap-3 text-sm"
             @click="
-              this.data.preferences.showTodos = 'completed';
+              data.preferences.showTodos = 'completed';
               rearrangeTodos();
             "
           >
-            <RecordCircle v-if="this.data.preferences.showTodos === 'completed'" />
+            <RecordCircle v-if="data.preferences.showTodos === 'completed'" />
             <Circle v-else />
             <p>Completed</p>
           </a>
@@ -709,33 +690,27 @@ export default {
   </div>
   <div class="mt-4"></div>
   <a
-    v-if="!this.data.preferences.hideBanner"
+    v-if="!data.preferences.hideBanner"
     target="_blank"
     href="https://github.com/ubeydeozdmr/crema-todo"
     class="rounded text-xs text-center w-full bg-gray-200 dark:bg-gray-700 dark:text-gray-300 fixed bottom-0 left-0"
   >
     Created by Ubeyde Emir Özdemir with ❤️ Click for GitHub link
   </a>
-  <!-- <button
-    @click="myFunc"
-    class="rounded text-sm bg-gray-200 absolute bottom-0 right-0"
-  >
-    Take a log for console (Just for development)
-  </button> -->
   <div
-    v-if="this.cache.showLastDeletedTodoNotification"
+    v-if="cache.showLastDeletedTodoNotification"
     class="absolute flex justify-between content-center bottom-8 left-3 right-3 md:left-1/3 md:right-1/3 bg-red-300 px-5 py-3 rounded"
   >
     <p class="inline-block py-1">Deleted to-do.</p>
     <div class="flex gap-3">
-      <button @click="this.recoverTodo()" class="bg-white rounded px-2 py-1">UNDO</button>
+      <button @click="recoverTodo()" class="bg-white rounded px-2 py-1">UNDO</button>
       <a
         href="#"
         @click.prevent
         class="px-2 py-1 font-bold"
         @click="
-          this.cache.showLastDeletedTodoNotification = false;
-          this.cache.lastDeletedTodo = undefined;
+          cache.showLastDeletedTodoNotification = false;
+          cache.lastDeletedTodo = undefined;
         "
         >&#9587;</a
       >
