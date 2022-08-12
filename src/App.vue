@@ -100,10 +100,6 @@ export default {
       },
       deep: true,
     },
-    'data.user.firstName': {
-      handler(input) {
-        this.data.user.firstName = input.trim();
-      },
     },
   },
   created() {
@@ -494,7 +490,7 @@ export default {
             id="firstName"
             class="rounded bg-gray-100 dark:bg-gray-700 dark:text-white px-3"
             placeholder="Your first name"
-            v-model="this.data.user.firstName"
+            v-model.trim="data.user.firstName"
           />
         </div>
         <p class="dark:text-gray-400 text-sm">Theme:</p>
