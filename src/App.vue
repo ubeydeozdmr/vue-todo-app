@@ -372,20 +372,11 @@ export default {
             <a
               href="#"
               @click.prevent
-              v-if="todo.completed"
               @click="toggleStatus(todo.id)"
               class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200"
             >
-              <CheckSquare />
-            </a>
-            <a
-              href="#"
-              @click.prevent
-              v-else="todo.completed"
-              @click="toggleStatus(todo.id)"
-              class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200"
-            >
-              <Square />
+              <CheckSquare v-if="todo.completed" />
+              <Square v-else />
             </a>
           </div>
           <div class="w-10/12">
@@ -482,9 +473,7 @@ export default {
             @click="data.preferences.theme = 'os'"
           >
             <RecordCircle
-              v-if="
-                data.preferences.theme === 'os' || data.preferences.theme === undefined
-              "
+              v-if="data.preferences.theme === 'os' || !data.preferences.theme"
             />
             <Circle v-else />
             <p>System</p>
