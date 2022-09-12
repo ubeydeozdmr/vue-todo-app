@@ -364,28 +364,17 @@ export default {
           <div
             class="w-1/12 flex justify-center"
             :class="
-              data.preferences.date !== 'hide' && data.preferences.date !== undefined
-                ? 'mt-2'
-                : 'mt-0'
+              data.preferences.date !== 'hide' && !data.preferences.date ? 'mt-2' : 'mt-0'
             "
           >
             <a
               href="#"
               @click.prevent
-              v-if="todo.completed"
               @click="toggleStatus(todo.id)"
               class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200"
             >
-              <CheckSquare />
-            </a>
-            <a
-              href="#"
-              @click.prevent
-              v-else="todo.completed"
-              @click="toggleStatus(todo.id)"
-              class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200"
-            >
-              <Square />
+              <CheckSquare v-if="todo.completed" />
+              <Square v-else />
             </a>
           </div>
           <div class="w-10/12 flex flex-col gap-1/2">
@@ -400,9 +389,7 @@ export default {
               "
             />
             <p
-              v-if="
-                data.preferences.date !== 'hide' && data.preferences.date !== undefined
-              "
+              v-if="data.preferences.date !== 'hide' && !data.preferences.date"
               class="text-xs text-gray-800 dark:text-gray-400"
               :class="todo.completed ? 'text-gray-300 dark:text-gray-700' : ''"
             >
@@ -412,9 +399,7 @@ export default {
           <div
             class="w-1/12 flex gap-3 justify-center"
             :class="
-              data.preferences.date !== 'hide' && data.preferences.date !== undefined
-                ? 'mt-2'
-                : 'mt-0'
+              data.preferences.date !== 'hide' && !data.preferences.date ? 'mt-2' : 'mt-0'
             "
           >
             <a
@@ -488,9 +473,7 @@ export default {
             @click="data.preferences.theme = 'os'"
           >
             <RecordCircle
-              v-if="
-                data.preferences.theme === 'os' || data.preferences.theme === undefined
-              "
+              v-if="data.preferences.theme === 'os' || !data.preferences.theme"
             />
             <Circle v-else />
             <p>System</p>
