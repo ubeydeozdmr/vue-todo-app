@@ -9,6 +9,7 @@ import Circle from './icons/circle.vue';
 import RecordCircle from './icons/record-circle.vue';
 import ChevronRight from './icons/chevron-right.vue';
 import ChevronBottom from './icons/chevron-bottom.vue';
+import Banner from './components/banner.vue';
 
 let timeout;
 
@@ -312,6 +313,7 @@ export default {
     RecordCircle,
     ChevronRight,
     ChevronBottom,
+    Banner,
   },
 };
 </script>
@@ -364,7 +366,7 @@ export default {
           <div
             class="w-1/12 flex justify-center"
             :class="
-              data.preferences.date !== 'hide' && !data.preferences.date ? 'mt-2' : 'mt-0'
+              data.preferences.date !== 'hide' && data.preferences.date ? 'mt-2' : 'mt-0'
             "
           >
             <a
@@ -377,21 +379,19 @@ export default {
               <Square v-else />
             </a>
           </div>
-          <div class="w-10/12 flex flex-col gap-1/2">
+          <div class="w-10/12">
             <input
               type="text"
               :name="todo.id"
               :id="todo.id"
               v-model="todo.content"
               class="w-full dark:bg-gray-800 dark:text-gray-300"
-              :class="
-                todo.completed ? 'line-through text-gray-400 dark:text-gray-600' : ''
-              "
+              :class="{ 'line-through text-gray-400 dark:text-gray-600': todo.completed }"
             />
             <p
-              v-if="data.preferences.date !== 'hide' && !data.preferences.date"
+              v-if="data.preferences.date !== 'hide' && data.preferences.date"
               class="text-xs text-gray-800 dark:text-gray-400"
-              :class="todo.completed ? 'text-gray-300 dark:text-gray-700' : ''"
+              :class="{ 'text-gray-300 dark:text-gray-700': todo.completed }"
             >
               {{ formatDate(todo.date) }}
             </p>
@@ -399,7 +399,7 @@ export default {
           <div
             class="w-1/12 flex gap-3 justify-center"
             :class="
-              data.preferences.date !== 'hide' && !data.preferences.date ? 'mt-2' : 'mt-0'
+              data.preferences.date !== 'hide' && data.preferences.date ? 'mt-2' : 'mt-0'
             "
           >
             <a
@@ -672,21 +672,14 @@ export default {
     </div>
   </div>
   <div class="mt-4"></div>
-  <a
-    v-if="!data.preferences.hideBanner"
-    target="_blank"
-    href="https://github.com/ubeydeozdmr/crema-todo"
-    class="rounded text-xs text-center w-full bg-gray-200 dark:bg-gray-700 dark:text-gray-300 fixed bottom-0 left-0"
-  >
-    Created by Ubeyde Emir Özdemir with ❤️ Click for GitHub link
-  </a>
+  <Banner v-if="!data.preferences.hideBanner" />
   <div
     v-if="cache.showLastDeletedTodoNotification"
     class="absolute flex justify-between content-center bottom-8 left-3 right-3 md:left-1/3 md:right-1/3 bg-red-300 px-5 py-3 rounded"
   >
     <p class="inline-block py-1">Deleted to-do.</p>
     <div class="flex gap-3">
-      <button @click="recoverTodo()" class="bg-white rounded px-2 py-1">UNDO</button>
+      <button @click="recoverTodo" class="bg-white rounded px-2 py-1">UNDO</button>
       <a
         href="#"
         @click.prevent
